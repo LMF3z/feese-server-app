@@ -22,3 +22,4 @@ app.listen(app.get('port'), async () => {
   await connectionDB.connect();
   console.log(`API running on port ${app.get('port')}`);
 });
+module.exports = app;
