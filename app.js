@@ -23,4 +23,4 @@ app.listen(app.get('port'), async () => {
   console.log(`API running on port ${app.get('port')}`);
 });
 
-app;
+module.exports = app;
