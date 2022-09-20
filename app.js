@@ -1,9 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const { connectionDB } = require('./config/mysql');
+const { connectionDB } = require('./src/config/mysql');
 
-const router = require('./routes/index');
+const router = require('./src/routes/index');
 
 const app = express();
 
@@ -23,4 +23,4 @@ app.listen(app.get('port'), async () => {
   console.log(`API running on port ${app.get('port')}`);
 });
 
-module.exports = app;
+app;
