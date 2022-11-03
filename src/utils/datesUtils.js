@@ -1,5 +1,4 @@
-const dateFnsTz = require('date-fns-tz');
-const { formatInTimeZone } = dateFnsTz;
+const { formatInTimeZone } = require('date-fns-tz');
 
 const getLocalDateTime = (formateDate = 'America/Caracas') => {
   const date = new Date();
