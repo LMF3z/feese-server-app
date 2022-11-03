@@ -7,6 +7,8 @@ const expendituresRouter = require('./expenditures/expenditures.routes');
 const servicesRouter = require('./services/services.routes');
 const clientsRouter = require('./clients/clients.routes');
 const ordersRouter = require('./orders/orders.routes');
+const productsRouter = require('./products/products.routes');
+const ordersProductsRouter = require('./products/ordersProducts.routes');
 
 router.get('/', (_req, res) => {
   res.json({ message: 'Hello world from API' });
@@ -18,5 +20,7 @@ router.use('/expenditures', expendituresRouter);
 router.use('/services', servicesRouter);
 router.use('/clients', clientsRouter);
 router.use('/orders', ordersRouter);
+router.use('/products', productsRouter);
+router.use('/orders-products', ordersProductsRouter);
 
 module.exports = router;

@@ -1,4 +1,7 @@
-const { loginUserForCompany } = require('../auth/auth.service');
+const {
+  loginUserForCompany,
+  loginForProductsServices,
+} = require('../auth/auth.service');
 const companyService = require('../companies/companies.service');
 const { getUserForCompanyByEmail } = require('../employees/employees.service');
 
@@ -12,6 +15,7 @@ const loginUser = async (data) => {
         data.password,
         dataCompany.data
       );
+
       return companyLogin;
     }
 
@@ -23,6 +27,7 @@ const loginUser = async (data) => {
         data.password,
         dataUserForCompany.data
       );
+
       return userFormCompanyLogin;
     }
 
@@ -32,6 +37,8 @@ const loginUser = async (data) => {
       data: [],
     };
   } catch (error) {
+    console.log('Error al iniciar sesión *****************', error);
+
     return {
       success: false,
       msg: 'Error al iniciar sesión',

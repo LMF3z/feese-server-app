@@ -1,5 +1,4 @@
 const axios = require('axios');
-const cheerio = require('cheerio');
 const { membershipData } = require('../../constants/globalsConstants');
 const ModelCompanyMembership = require('../../models/companies-memberships/companiesMemberships.model');
 const {
@@ -22,8 +21,6 @@ const saveNewPaymentCompanyMembership = async (data) => {
     }
 
     const totalPayment = data.dollar_value * membershipData.valor;
-
-    console.log('totalPayment --------------------------->', totalPayment);
 
     if (totalPayment !== data.amount_payment_membership) {
       return {
@@ -59,36 +56,31 @@ const getLastDatePaymentMembership = async (id_company) => {
       return rateDollar;
     }
 
-    const lastDatePayment = await ModelCompanyMembership.findOne({
-      where: {
-        id_company,
-      },
-      order: [['id', 'DESC']],
-    });
+    const lastDatePayment = await getLastPayment(id_company);
 
-    const parsedRateDollar = Number(
-      rateDollar?.data?.slice(1, 5).replace(',', '.')
-    );
+    const parsedRateDollar = Number(rateDollar?.data);
 
     // * total a pagar
     const totalToPayment = parsedRateDollar * membershipData.valor;
+
+    const responseData = {
+      lastDatePayment: lastDatePayment?.createdAt
+        ? lastDatePayment?.createdAt
+        : null,
+      rateDollar: parsedRateDollar,
+      priceMembership: membershipData.valor,
+      totalToPayment,
+      stateMembership: lastDatePayment?.state_payment
+        ? lastDatePayment?.state_payment
+        : 'inactiva',
+    };
 
     return {
       success: true,
       msg: !lastDatePayment?.createdAt
         ? 'No tienes pagos aún'
         : `Ultimo pago: ${lastDatePayment.createdAt}`,
-      data: {
-        lastDatePayment: lastDatePayment?.createdAt
-          ? lastDatePayment?.createdAt
-          : null,
-        rateDollar: parsedRateDollar,
-        priceMembership: membershipData.valor,
-        totalToPayment,
-        stateMembership: lastDatePayment?.state_payment
-          ? lastDatePayment?.state_payment
-          : 'inactiva',
-      },
+      data: responseData,
     };
   } catch (error) {
     console.log('Error al buscar ultimo pago.', error);
@@ -156,17 +148,14 @@ const updateStateMembership = async (id_company, newState) => {
 
 const getDollarRate = async () => {
   try {
-    const rateBCV = await axios.get('http://www.bcv.org.ve/');
-
-    const html = rateBCV.data;
-    const $ = cheerio.load(html);
-    const base = $('#dolar', html).children().children().html();
-    const bcvRateDollar = $('strong', base).html();
+    const { data } = await axios.get(
+      'https://s3.amazonaws.com/dolartoday/data.json'
+    );
 
     return {
       success: true,
       msg: 'Dolar BCV',
-      data: bcvRateDollar,
+      data: data?.USD?.dolartoday,
     };
   } catch (error) {
     return {
@@ -177,8 +166,32 @@ const getDollarRate = async () => {
   }
 };
 
+const getLastPayment = async (id_company) => {
+  try {
+    const lastDatePayment = await ModelCompanyMembership.findOne({
+      where: {
+        id_company,
+      },
+      order: [['id', 'DESC']],
+    });
+
+    return {
+      success: true,
+      msg: 'Ultimo pago de membresía',
+      data: lastDatePayment,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      msg: 'Error al obtener último pago de membresía',
+      data: [],
+    };
+  }
+};
+
 module.exports.saveNewPaymentCompanyMembership =
   saveNewPaymentCompanyMembership;
 module.exports.getLastDatePaymentMembership = getLastDatePaymentMembership;
 module.exports.updateStateMembership = updateStateMembership;
 module.exports.validateIsMembershipActive = validateIsMembershipActive;
+module.exports.getLastPayment = getLastPayment;

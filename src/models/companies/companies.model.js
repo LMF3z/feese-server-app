@@ -40,6 +40,11 @@ const Company = connectionDB.sequelize.define(
       allowNull: false,
       unique: true,
     },
+    type_company: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'services',
+    },
     password_company: {
       type: DataTypes.STRING,
       allowNull: false,

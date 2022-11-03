@@ -6,11 +6,14 @@ const FormRegisterCompanySchema = yup.object().shape({
     .matches(/^[a-zA-Zá-üÁ-Ü ]+$/, 'Ingresa un nombre valido.')
     .required(),
   address_company: yup.string().required('Dirección es requerida.'),
-  // rif_company: yup.string().required().matches(),
+  // rif_company: yup.string().matches(),
   email_company: yup
     .string()
     .email('Ingresa un correo valido.')
     .required('Correo es requerido.'),
+  type_company: yup
+    .string('Ingrese tipo de empresa.')
+    .required('Campo requerido.'),
   password_company: yup
     .string()
     .required('Contraseña es requerida.')

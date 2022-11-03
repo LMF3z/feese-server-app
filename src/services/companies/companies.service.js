@@ -2,7 +2,6 @@ const ModelCompany = require('../../models/companies/companies.model');
 const ModelCompanyMembership = require('../../models/companies-memberships/companiesMemberships.model');
 const handlePasswords = require('../../validations/handlePasswords');
 const handleErrors = require('../../validations/handleErrors');
-const { getLocalDateTime } = require('../../utils/datesUtils');
 const { validateIsMembershipActive } = require('./companiesMembership.service');
 
 const saveNewCompany = async (data) => {
@@ -124,6 +123,7 @@ const loginCompany = async (pass, dataCompany) => {
         id_company: dataCompany.id,
         email_company: dataCompany.email_company,
         isCompany: dataCompany.isCompany,
+        type_company: dataCompany.type_company,
         token,
         isMembershipActive: isActive.data,
       },

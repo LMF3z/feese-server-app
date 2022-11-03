@@ -1,4 +1,8 @@
+const axios = require('axios').default;
 const handlePasswords = require('../../validations/handlePasswords');
+
+const products_base_url = process.env.PRODUCTS_BASE_URL;
+
 const {
   validateIsMembershipActive,
 } = require('../companies/companiesMembership.service');
