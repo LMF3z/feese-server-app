@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  feeseserver:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: feeseserver
+    container_name: feeseserver
+    restart: always
+    env_file: .env
+    environment:
+      - TYPE_CONNECTION=$TYPE_CONNECTION
+      - REMOTE_DB=$REMOTE_DB
+      - REMOTE_USER_DB=$REMOTE_USER_DB
+      - REMOTE_PASSWORD_DB=$REMOTE_PASSWORD_DB
+      - REMOTE_HOST_DB=$REMOTE_HOST_DB
+      - JWT_SECRET=JWT_SECRET
+    ports:
+      - "3001:3001"
+    volumes:
+      - .:/usr/src/app
