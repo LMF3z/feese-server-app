@@ -78,8 +78,8 @@ const getOrdersListByRangeDateFromDB = async (req, res) => {
 };
 
 const annularOrderController = async (req, res) => {
-  const { id } = req.query;
-  const nullified = await annularOrder(id);
+  const { id_order } = req.body;
+  const nullified = await annularOrder(id_order);
   res.json(nullified);
 };
 

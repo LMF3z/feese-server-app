@@ -12,6 +12,10 @@ const {
 } = require('../orders/orders.service');
 const { getEmployeeByID, getEmployees } = require('./employees.service');
 const { generateSequentialNumber } = require('../../utils/orders.utils');
+const {
+  getLocalDateTime,
+  getOnlyDateFromNewDate,
+} = require('../../utils/datesUtils');
 
 const getAmountPayments = async (id) => {
   try {
@@ -54,6 +58,31 @@ const createNewEmployeePayment = async (data) => {
       data.id_employee
     );
 
+    // * verificar la ultima fecha de adelanto. Si el tipo de pago es adelanto y la fecha del ultimo adelanto coincide con la del dia actual no se puede registrar
+    const currentDate = getOnlyDateFromNewDate(getLocalDateTime());
+
+    if (
+      lastPaymentAdvance?.data?.last_date_advance_payment === currentDate &&
+      data?.payment_type === paymentsModes.advance
+    ) {
+      return {
+        success: false,
+        msg: 'No se pueden registrar adelantos con la misma fecha.',
+        data: null,
+      };
+    }
+
+    if (
+      lastPaymentComplete?.data?.last_date_complete_payment === currentDate &&
+      data?.payment_type === paymentsModes.complete
+    ) {
+      return {
+        success: false,
+        msg: 'No se pueden registrar pagos con la misma fecha.',
+        data: null,
+      };
+    }
+
     newPayment = {
       ...data,
       last_date_complete_payment:
@@ -81,9 +110,10 @@ const createNewEmployeePayment = async (data) => {
     return {
       success: true,
       msg: 'Pago registrado exitosamente.',
-      data: saved,
+      data: null,
     };
   } catch (error) {
+    console.log('Error al registrar pago a empleado ----->', error);
     return {
       success: false,
       msg: 'Error al registrar pago a empleado ',

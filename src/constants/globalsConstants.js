@@ -13,5 +13,5 @@ module.exports.usersForCompany = {
 };
 
 module.exports.membershipData = {
-  valor: 15,
+  valor: 14.5,
 };

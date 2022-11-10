@@ -1,4 +1,5 @@
 const axios = require('axios');
+const add = require('date-fns/add');
 const { membershipData } = require('../../constants/globalsConstants');
 const ModelCompanyMembership = require('../../models/companies-memberships/companiesMemberships.model');
 const {
@@ -15,14 +16,14 @@ const saveNewPaymentCompanyMembership = async (data) => {
     if (isNotActiveMembership.data) {
       return {
         success: false,
-        msg: 'Usted tiene una membresía activa. Por lo cual no se puede registrar un buevo pago hasta que su membresía caduque.',
+        msg: 'Usted tiene una membresía activa. Por lo cual no se puede registrar un nuevo pago hasta que su membresía caduque.',
         data: [],
       };
     }
 
     const totalPayment = data.dollar_value * membershipData.valor;
 
-    if (totalPayment !== data.amount_payment_membership) {
+    if (Number(totalPayment.toFixed(2)) !== data.amount_payment_membership) {
       return {
         success: false,
         msg: 'Cantidad pagada no es la correcta. Por favor verifique y vuelva a intentar.',
@@ -32,6 +33,8 @@ const saveNewPaymentCompanyMembership = async (data) => {
 
     const newRegister = new ModelCompanyMembership(data);
     const registered = await newRegister.save();
+
+    await updateStateMembership(data.id_company, 'procesando');
 
     return {
       success: true,
@@ -63,16 +66,20 @@ const getLastDatePaymentMembership = async (id_company) => {
     // * total a pagar
     const totalToPayment = parsedRateDollar * membershipData.valor;
 
+    // * proxima fecha a pagar
+    const nextPaymentDate = add(new Date(lastDatePayment?.data?.createdAt), {
+      months: 1,
+    });
+
     const responseData = {
-      lastDatePayment: lastDatePayment?.createdAt
-        ? lastDatePayment?.createdAt
-        : null,
+      lastDatePayment: lastDatePayment?.data?.createdAt ?? null,
       rateDollar: parsedRateDollar,
       priceMembership: membershipData.valor,
       totalToPayment,
-      stateMembership: lastDatePayment?.state_payment
-        ? lastDatePayment?.state_payment
+      stateMembership: lastDatePayment?.data?.state_payment
+        ? lastDatePayment?.data?.state_payment
         : 'inactiva',
+      nextPaymentDate: nextPaymentDate ?? '',
     };
 
     return {
@@ -97,11 +104,11 @@ const validateIsMembershipActive = async (id_company) => {
     const { data } = await getLastDatePaymentMembership(id_company);
 
     const elapsedDays = getElapseDaysBetweenTwoDates(
-      data.lastDatePayment,
+      data?.lastDatePayment,
       getLocalDateTime()
     );
 
-    const result = Number.isNaN(elapsedDays)
+    const isActive = Number.isNaN(elapsedDays)
       ? false
       : elapsedDays > 31
       ? false
@@ -110,7 +117,7 @@ const validateIsMembershipActive = async (id_company) => {
     return {
       success: true,
       msg: 'Estado de la membresía.',
-      data: result,
+      data: isActive,
     };
   } catch (error) {
     return {
@@ -178,7 +185,7 @@ const getLastPayment = async (id_company) => {
     return {
       success: true,
       msg: 'Ultimo pago de membresía',
-      data: lastDatePayment,
+      data: lastDatePayment.dataValues,
     };
   } catch (error) {
     return {

@@ -10,7 +10,25 @@ const {
 } = require('../../services/employees/employeesPayments.service');
 
 const saveNewEmployeePayment = async (req, res) => {
-  const saved = await createNewEmployeePayment(req.body);
+  const body = req.body;
+
+  if (body.payment_amount <= 0) {
+    return res.json({
+      success: false,
+      msg: 'Total a pagar debe ser mayor a 0.',
+      data: null,
+    });
+  }
+
+  if (body.totalGenerate <= 0 && body.payment_type === 'complete') {
+    return res.json({
+      success: false,
+      msg: 'No se puede procesar el pago completo por no tener saldo a favor.',
+      data: null,
+    });
+  }
+
+  const saved = await createNewEmployeePayment(body);
   res.json(saved);
 };
 

@@ -1,11 +1,23 @@
 const {
-  updateStateMembership,
   validateIsMembershipActive,
 } = require('../../services/companies/companiesMembership.service');
 
 const validateStateMembership = async (req, res, next) => {
   try {
-    const isActive = await validateIsMembershipActive(req.body.id_company);
+    const { id_company } = req.body;
+    const query = req.query;
+
+    if (!id_company && !query.id_company) {
+      return res.json({
+        success: false,
+        msg: 'Imposible encontrar empresa.',
+        data: null,
+      });
+    }
+
+    const isActive = await validateIsMembershipActive(
+      id_company ? id_company : query.id_company
+    );
 
     if (!isActive.data) {
       // await updateStateMembership(req.body.id_company, 'inactiva');
@@ -27,4 +39,4 @@ const validateStateMembership = async (req, res, next) => {
   }
 };
 
-module.exports.validateStateMembership = validateStateMembership;
+module.exports = { validateStateMembership };

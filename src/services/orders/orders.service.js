@@ -47,6 +47,7 @@ const existCashOnBox = async ({ id_company, actualDate }) => {
       where: {
         id_company: id_company,
         createdAt: actualDate,
+        state_null: false,
       },
       attributes: [
         [sequelize.fn('sum', sequelize.col('cash')), 'cashTotal'],
@@ -327,7 +328,8 @@ const getTotalAmountOfOrdersForEmployee = async (
         },
       });
 
-      ordersAssociatedToEmployee.push(totalAmountFromOrders);
+      totalAmountFromOrders &&
+        ordersAssociatedToEmployee.push(totalAmountFromOrders?.dataValues);
     }
 
     return {

@@ -34,5 +34,10 @@ const getElapseDaysBetweenTwoDates = (initialDate, finalDate) => {
   return days;
 };
 
-module.exports.getLocalDateTime = getLocalDateTime;
-module.exports.getElapseDaysBetweenTwoDates = getElapseDaysBetweenTwoDates;
+const getOnlyDateFromNewDate = (date) => date.split(' ')[0];
+
+module.exports = {
+  getLocalDateTime,
+  getElapseDaysBetweenTwoDates,
+  getOnlyDateFromNewDate,
+};
