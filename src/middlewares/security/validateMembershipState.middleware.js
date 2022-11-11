@@ -10,7 +10,7 @@ const validateStateMembership = async (req, res, next) => {
     if (!id_company && !query.id_company) {
       return res.json({
         success: false,
-        msg: 'Imposible encontrar empresa.',
+        msg: 'De momento esta acción esta suspendida por motivos de seguridad.',
         data: null,
       });
     }
